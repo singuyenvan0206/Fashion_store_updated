@@ -58,9 +58,7 @@ namespace WpfApp1
                 PurchaseUnit = p.PurchaseUnit,
                 ImportQuantity = p.ImportQuantity,
                 StockQuantity = p.StockQuantity,
-                PurchaseUnit = p.PurchaseUnit,
-                ImportQuantity = p.ImportQuantity,
-                StockQuantity = p.StockQuantity,
+
                 Description = p.Description,
                 SupplierId = p.SupplierId,
                 SupplierName = p.SupplierName

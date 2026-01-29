@@ -97,7 +97,7 @@
                                         <TextBlock Text="📞 "/>
                                         <TextBlock Text="{Binding Phone}" Margin="0,0,15,0"/>
                                         <TextBlock Text="👤 "/>
-                                        <TextBlock Text="{Binding ContactPerson}"/>
+                                        <TextBlock Text="{Binding ContactName}"/>
                                     </StackPanel>
                                     <TextBlock Text="{Binding Address}" FontStyle="Italic" Foreground="#666" FontSize="12"/>
                                 </StackPanel>

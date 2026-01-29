@@ -27,7 +27,7 @@ namespace WpfApp1
             var supplier = new Supplier
             {
                 Name = NameTextBox.Text.Trim(),
-                ContactPerson = ContactTextBox.Text.Trim(),
+                ContactName = ContactTextBox.Text.Trim(),
                 Phone = PhoneTextBox.Text.Trim(),
                 Email = EmailTextBox.Text.Trim(),
                 Address = AddressTextBox.Text.Trim(),
@@ -57,7 +57,7 @@ namespace WpfApp1
             if (!ValidateInput()) return;
 
             selectedSupplier.Name = NameTextBox.Text.Trim();
-            selectedSupplier.ContactPerson = ContactTextBox.Text.Trim();
+            selectedSupplier.ContactName = ContactTextBox.Text.Trim();
             selectedSupplier.Phone = PhoneTextBox.Text.Trim();
             selectedSupplier.Email = EmailTextBox.Text.Trim();
             selectedSupplier.Address = AddressTextBox.Text.Trim();
@@ -131,7 +131,7 @@ namespace WpfApp1
             if (SuppliersListBox.SelectedItem is Supplier selectedSupplier)
             {
                 NameTextBox.Text = selectedSupplier.Name;
-                ContactTextBox.Text = selectedSupplier.ContactPerson;
+                ContactTextBox.Text = selectedSupplier.ContactName;
                 PhoneTextBox.Text = selectedSupplier.Phone;
                 EmailTextBox.Text = selectedSupplier.Email;
                 AddressTextBox.Text = selectedSupplier.Address;

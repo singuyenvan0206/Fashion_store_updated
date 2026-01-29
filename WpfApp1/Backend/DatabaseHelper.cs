@@ -119,6 +119,32 @@ namespace WpfApp1
             using var invItemsCmd = new MySqlCommand(invoiceItemsCmd, connection);
             invItemsCmd.ExecuteNonQuery();
 
+            string suppliersCmd = @"CREATE TABLE IF NOT EXISTS Suppliers (
+                Id INT AUTO_INCREMENT PRIMARY KEY,
+                Name VARCHAR(255) NOT NULL,
+                ContactName VARCHAR(255),
+                Phone VARCHAR(50),
+                Email VARCHAR(255),
+                Address TEXT
+            );";
+            using var supCmd = new MySqlCommand(suppliersCmd, connection);
+            supCmd.ExecuteNonQuery();
+
+            string vouchersCmd = @"CREATE TABLE IF NOT EXISTS Vouchers (
+                Id INT AUTO_INCREMENT PRIMARY KEY,
+                Code VARCHAR(50) NOT NULL UNIQUE,
+                DiscountType VARCHAR(20) NOT NULL,
+                DiscountValue DECIMAL(12,2) NOT NULL,
+                MinInvoiceAmount DECIMAL(12,2) NOT NULL DEFAULT 0,
+                StartDate DATETIME NOT NULL,
+                EndDate DATETIME NOT NULL,
+                UsageLimit INT NOT NULL DEFAULT 0,
+                UsedCount INT NOT NULL DEFAULT 0,
+                IsActive BOOLEAN NOT NULL DEFAULT 1
+            );";
+            using var vouchCmd = new MySqlCommand(vouchersCmd, connection);
+            vouchCmd.ExecuteNonQuery();
+
             UpdateProductsTable(connection);
             FixExistingProductData(connection);
 
@@ -431,6 +457,18 @@ namespace WpfApp1
                     string addImportQtyCmd = "ALTER TABLE Products ADD COLUMN ImportQuantity INT DEFAULT 0 AFTER PurchaseUnit;";
                     using var addImportQty = new MySqlCommand(addImportQtyCmd, connection);
                     addImportQty.ExecuteNonQuery();
+                }
+
+                // Check if SupplierId column exists
+                string checkSupplierIdCmd = "SHOW COLUMNS FROM Products LIKE 'SupplierId';";
+                using var checkSupplierId = new MySqlCommand(checkSupplierIdCmd, connection);
+                var supplierIdExists = checkSupplierId.ExecuteScalar();
+
+                if (supplierIdExists == null)
+                {
+                    string addSupplierIdCmd = "ALTER TABLE Products ADD COLUMN SupplierId INT DEFAULT 0;";
+                    using var addSupplierId = new MySqlCommand(addSupplierIdCmd, connection);
+                    addSupplierId.ExecuteNonQuery();
                 }
 
             }
