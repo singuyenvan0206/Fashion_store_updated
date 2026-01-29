@@ -1,0 +1,124 @@
+<Window x:Class="WpfApp1.SupplierManagementWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Quản Lý Nhà Cung Cấp" Height="700" Width="900"
+        WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="8"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="Padding" Value="8,6"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="BorderBrush" Value="#CCCCCC"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+        </Style>
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#555"/>
+            <Setter Property="Margin" Value="0,0,0,4"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+    </Window.Resources>
+    <Grid Background="#F5F5F5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Header -->
+        <Border Grid.Row="0" Background="#1CB5E0" Padding="20">
+            <TextBlock Text="🏭 Quản Lý Nhà Cung Cấp" FontSize="24" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
+        </Border>
+        
+        <!-- Content -->
+        <Grid Grid.Row="1" Margin="20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="350"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Input Form -->
+            <Border Grid.Column="0" CornerRadius="12" Padding="20" Background="White" BorderBrush="#E0E0E0" BorderThickness="1" Margin="0,0,20,0">
+                <StackPanel>
+                    <TextBlock Text="Tên Nhà Cung Cấp *" FontWeight="Bold"/>
+                    <TextBox x:Name="NameTextBox"/>
+
+                    <TextBlock Text="Người Liên Hệ"/>
+                    <TextBox x:Name="ContactTextBox"/>
+
+                    <TextBlock Text="Số Điện Thoại"/>
+                    <TextBox x:Name="PhoneTextBox"/>
+
+                    <TextBlock Text="Email"/>
+                    <TextBox x:Name="EmailTextBox"/>
+
+                    <TextBlock Text="Địa Chỉ"/>
+                    <TextBox x:Name="AddressTextBox" TextWrapping="Wrap" Height="60"/>
+
+                    <TextBlock Text="Ghi Chú"/>
+                    <TextBox x:Name="NoteTextBox" TextWrapping="Wrap" Height="60"/>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0" HorizontalAlignment="Center">
+                        <Button Content="➕ Thêm" Width="80" Background="#4CAF50" Foreground="White" Click="AddButton_Click" Margin="0,0,10,0"/>
+                        <Button Content="✏️ Sửa" Width="80" Background="#2196F3" Foreground="White" Click="UpdateButton_Click" Margin="0,0,10,0"/>
+                        <Button Content="🗑️ Xóa" Width="80" Background="#F44336" Foreground="White" Click="DeleteButton_Click"/>
+                    </StackPanel>
+                    <Button Content="🧹 Xóa Form" Background="#9E9E9E" Foreground="White" Margin="0,10,0,0" Click="ClearButton_Click"/>
+                </StackPanel>
+            </Border>
+
+            <!-- List -->
+            <Border Grid.Column="1" CornerRadius="12" Padding="20" Background="White" BorderBrush="#E0E0E0" BorderThickness="1">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top" Text="Danh Sách Nhà Cung Cấp" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
+                    <ListBox x:Name="SuppliersListBox" SelectionChanged="SuppliersListBox_SelectionChanged" BorderBrush="#CCCCCC" BorderThickness="1">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Margin="5">
+                                    <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="16"/>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="📞 "/>
+                                        <TextBlock Text="{Binding Phone}" Margin="0,0,15,0"/>
+                                        <TextBlock Text="👤 "/>
+                                        <TextBlock Text="{Binding ContactPerson}"/>
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding Address}" FontStyle="Italic" Foreground="#666" FontSize="12"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Padding" Value="10"/>
+                                <Setter Property="Margin" Value="0,2"/>
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="Background" Value="#E3F2FD"/>
+                                        <Setter Property="BorderBrush" Value="#1CB5E0"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                    </ListBox>
+                </DockPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>

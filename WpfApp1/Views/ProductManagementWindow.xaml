@@ -1,0 +1,330 @@
+<Window x:Class="WpfApp1.ProductManagementWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:WpfApp1"
+        Title="Quản Lý Sản Phẩm" Height="800" Width="1200"
+        MinWidth="1200" MinHeight="800"
+        WindowStartupLocation="CenterScreen">
+    
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <Style TargetType="Button">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="0"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="Padding" Value="8,6"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="BorderBrush" Value="#CCCCCC"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+        <Style TargetType="ComboBox">
+            <Setter Property="Padding" Value="8,6"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="BorderBrush" Value="#CCCCCC"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+    </Window.Resources>
+    
+    <Grid Background="#F5F5F5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <Border Grid.Row="0" Background="#1CB5E0" Padding="20">
+            <TextBlock Text="📦 Quản Lý Sản Phẩm" FontSize="24" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
+        </Border>
+        <Grid Grid.Row="1" Margin="20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="350"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Border Grid.Column="0" Background="White" CornerRadius="10" Padding="20" Margin="0,0,10,0">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <TextBlock Text="📝 Thông Tin Sản Phẩm" FontSize="18" FontWeight="Bold" Foreground="#1CB5E0" Margin="0,0,0,20"/>
+                        <TextBlock Text="Tên Sản Phẩm *" FontWeight="SemiBold" Margin="0,0,0,5" Height="19"/>
+                        <TextBox x:Name="ProductNameTextBox" Margin="0,0,0,15"/>
+                        <TextBlock Text="Mã Sản Phẩm" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                        <TextBox x:Name="ProductCodeTextBox" Margin="0,0,0,15"/>
+                        <TextBlock Text="Danh Mục" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                        <ComboBox x:Name="CategoryComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,15"/>
+                        <TextBlock Text="Giá *" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                        <TextBox x:Name="PriceTextBox" Margin="0,0,0,15"/>
+
+                        <!-- Promotion / Discount -->
+                        <TextBlock Text="Giảm giá (%)" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                        <TextBox x:Name="PromoDiscountPercentTextBox" Margin="0,0,0,15" Text="0"/>
+
+                        <TextBlock Text="Khuyến mãi từ ngày" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                        <DatePicker x:Name="PromoStartDatePicker" Margin="0,0,0,15" SelectedDateFormat="Short"/>
+
+                        <TextBlock Text="Khuyến mãi đến ngày" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                        <DatePicker x:Name="PromoEndDatePicker" Margin="0,0,0,15" SelectedDateFormat="Short"/>
+                        <TextBlock Text="Số Lượng Tồn *" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                        <TextBox x:Name="StockQuantityTextBox" Margin="0,0,0,15"/>
+                        
+                        <!-- Import Price -->
+                        <TextBlock Text="Giá Nhập" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                        <TextBox x:Name="ImportPriceTextBox" Margin="0,0,0,15"/>
+                        
+                        <!-- Import Quantity -->
+                        <TextBlock Text="Số Lượng Nhập" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                        <TextBox x:Name="ImportQuantityTextBox" Margin="0,0,0,15"/>
+                        
+                        <!-- Supplier/Unit -->
+                        <TextBlock Text="Nhà Cung Cấp" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                        <TextBox x:Name="UnitTextBox" Margin="0,0,0,15"/>
+                        
+                        <!-- Description -->
+                        <TextBlock Text="Mô Tả" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                        <TextBox x:Name="DescriptionTextBox" 
+                                 Height="50" 
+                                 TextWrapping="Wrap" 
+                                 AcceptsReturn="True"
+                                 VerticalScrollBarVisibility="Auto"
+                                 Margin="0,0,0,20"/>
+                        
+                        <!-- Action Buttons -->
+                        <TextBlock Text="Thao Tác" FontWeight="Bold" FontSize="16" Foreground="#1CB5E0" Margin="0,10,0,10"/>
+                        
+                        <!-- Primary Actions -->
+                        <UniformGrid Columns="2" Margin="0,0,0,10">
+                            <Button Content="➕ Thêm" 
+                                    Background="#4CAF50" 
+                                    Foreground="White" 
+                                    Click="AddButton_Click"
+                                    Margin="0,0,5,5"/>
+                            <Button Content="✏️ Cập Nhật" 
+                                    Background="#2196F3" 
+                                    Foreground="White" 
+                                    Click="UpdateButton_Click"
+                                    Margin="5,0,0,5"/>
+                        </UniformGrid>
+                        
+                        <Button Content="🗑️ Xóa" 
+                                Background="#F44336" 
+                                Foreground="White" 
+                                Click="DeleteButton_Click"
+                                Margin="0,0,0,10"/>
+                        
+                        <!-- Secondary Actions -->
+                        <TextBlock Text="Quản Lý Dữ Liệu" FontWeight="Bold" FontSize="14" Foreground="#666" Margin="0,15,0,10"/>
+
+                        <UniformGrid Columns="2" Margin="0,0,0,10">
+                            <Button Content="📥 Nhập CSV" 
+                                    Background="#FF9800" 
+                                    Foreground="White" 
+                                    Click="ImportCsvButton_Click"
+                                    Margin="0,0,5,5"/>
+                            <Button Content="📤 Xuất CSV" 
+                                    Background="#FF9800" 
+                                    Foreground="White"
+                                    Click="ExportCsvButton_Click"
+                                    Margin="5,0,0,5"/>
+                        </UniformGrid>
+                        <Button Content="⚠️ Xóa Tất Cả" 
+                                Background="#9E9E9E" 
+                                Foreground="White" 
+                                Click="DeleteAllButton_Click"
+                                Margin="0,5,0,0"/>
+
+                        <TextBlock x:Name="StatusTextBlock" 
+                                   Text="Sẵn sàng" 
+                                   FontSize="12" 
+                                   Foreground="#666666" 
+                                   HorizontalAlignment="Center" 
+                                   Margin="0,15,0,0"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+
+            <Border Grid.Column="1" 
+                    Background="White" 
+                    CornerRadius="10" 
+                    Padding="20">
+                <StackPanel>
+
+                    <Grid Margin="0,0,0,15">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        
+                        <TextBlock Grid.Row="0" 
+                                   Text="📦 Danh Sách Sản Phẩm" 
+                                   FontSize="18" 
+                                   FontWeight="Bold" 
+                                   Foreground="#1CB5E0"
+                                   Margin="0,0,0,10"/>
+                        
+                        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                            <TextBox x:Name="SearchTextBox" 
+                                     Width="250" 
+                                     Height="32"
+                                     Margin="0,0,10,0"
+                                     TextChanged="SearchTextBox_TextChanged"
+                                     VerticalContentAlignment="Center"
+                                     FontSize="14"
+                                     Padding="8,6"/>
+                            <Button Content="🔍 Tìm Kiếm" 
+                                    Width="100" 
+                                    Height="32"
+                                    Background="#FF9800" 
+                                    Foreground="White"
+                                    Click="SearchButton_Click"
+                                    FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </Grid>
+                    
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        
+                        <Border Grid.Row="0" BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="8">
+                            <DataGrid x:Name="ProductDataGrid" 
+                                      AutoGenerateColumns="False" 
+                                      IsReadOnly="True"
+                                      SelectionMode="Single"
+                                      SelectionChanged="ProductDataGrid_SelectionChanged"
+                                      GridLinesVisibility="Horizontal"
+                                      AlternatingRowBackground="#F8F9FA"
+                                      RowHeight="35"
+                                      MinHeight="525"
+                                      HorizontalAlignment="Stretch"
+                                      VerticalAlignment="Stretch"
+                                      ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                      ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                      ScrollViewer.CanContentScroll="True"
+                                      EnableRowVirtualization="True"
+                                      EnableColumnVirtualization="False"
+                                      CanUserResizeColumns="True"
+                                      HeadersVisibility="Column"
+                                      BorderThickness="0">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="ID" Binding="{Binding Id}" SortMemberPath="Id" Width="60">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                                            <Setter Property="FontWeight" Value="Bold"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Header="📦 Tên Sản Phẩm" Binding="{Binding Name}" SortMemberPath="Name" Width="250"/>
+                                <DataGridTextColumn Header="🏷️ Mã SP" Binding="{Binding Code}" SortMemberPath="Code" Width="120">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                                            <Setter Property="FontFamily" Value="Consolas"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Header="📂 Danh Mục" Binding="{Binding CategoryName}" SortMemberPath="CategoryName" Width="120"/>
+                                <DataGridTextColumn Header="💰 Giá Bán" Binding="{Binding SalePrice, StringFormat=N0}" SortMemberPath="SalePrice" Width="120">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="HorizontalAlignment" Value="Right"/>
+                                            <Setter Property="FontWeight" Value="Bold"/>
+                                            <Setter Property="Foreground" Value="#4CAF50"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Header="🔥 KM%" Binding="{Binding PromoDiscountPercent, StringFormat=N2}" SortMemberPath="PromoDiscountPercent" Width="80">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                                            <Setter Property="FontWeight" Value="Bold"/>
+                                            <Setter Property="Foreground" Value="#E91E63"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Header="📊 Tồn Kho" Binding="{Binding StockQuantity}" SortMemberPath="StockQuantity" Width="80">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                                            <Setter Property="FontWeight" Value="Bold"/>
+                                            <Setter Property="Foreground" Value="#FF9800"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Header="💰 Giá Nhập" Binding="{Binding PurchasePrice, StringFormat=N0}" SortMemberPath="PurchasePrice" Width="100">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="HorizontalAlignment" Value="Right"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Header="📦 SL Nhập" Binding="{Binding ImportQuantity}" SortMemberPath="ImportQuantity" Width="80">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Header="🏪 Nhà Cung Cấp" Binding="{Binding PurchaseUnit}" SortMemberPath="PurchaseUnit" Width="auto"/>
+                                <DataGridTextColumn Header="📝 Mô Tả" Binding="{Binding Description}" SortMemberPath="Description" Width="auto"/>
+                            </DataGrid.Columns>
+                            </DataGrid>
+                        </Border>
+                        
+                        <Border Grid.Row="1" Background="#F8F9FA" Padding="15" Margin="0,10,0,0" CornerRadius="8">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <!-- Page Info -->
+                                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Text="📄 Trang:" FontWeight="SemiBold" Margin="0,0,5,0"/>
+                                    <TextBlock x:Name="PageInfoTextBlock" Text="1 / 1" FontWeight="Bold" Foreground="#1CB5E0"/>
+                                    <TextBlock Text=" • " Margin="10,0"/>
+                                    <TextBlock Text="📊 Tổng:" FontWeight="SemiBold" Margin="0,0,5,0"/>
+                                    <TextBlock x:Name="TotalItemsTextBlock" Text="0 sản phẩm" FontWeight="Bold" Foreground="#FF9800"/>
+                                </StackPanel>
+                                
+                                <!-- Page Navigation -->
+                                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Button x:Name="FirstPageButton" Content="⏮️" Width="35" Height="30" 
+                                            Background="#2196F3" Foreground="White" FontWeight="Bold"
+                                            Click="FirstPageButton_Click" Margin="0,0,5,0"/>
+                                    <Button x:Name="PrevPageButton" Content="◀️" Width="35" Height="30" 
+                                            Background="#2196F3" Foreground="White" FontWeight="Bold"
+                                            Click="PrevPageButton_Click" Margin="0,0,5,0"/>
+                                    <TextBox x:Name="CurrentPageTextBox" Width="50" Height="30" 
+                                             TextAlignment="Center" VerticalContentAlignment="Center"
+                                             FontWeight="Bold" Margin="0,0,5,0"
+                                             KeyDown="CurrentPageTextBox_KeyDown"/>
+                                    <Button x:Name="NextPageButton" Content="▶️" Width="35" Height="30" 
+                                            Background="#2196F3" Foreground="White" FontWeight="Bold"
+                                            Click="NextPageButton_Click" Margin="0,0,5,0"/>
+                                    <Button x:Name="LastPageButton" Content="⏭️" Width="35" Height="30" 
+                                            Background="#2196F3" Foreground="White" FontWeight="Bold"
+                                            Click="LastPageButton_Click"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>
