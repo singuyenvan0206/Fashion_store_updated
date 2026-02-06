@@ -72,10 +72,8 @@ Update-Package -reinstall
 - Nếu gặp lỗi thiếu native SQLite, đảm bảo `SQLitePCLRaw.provider.e_sqlite3` được copy cùng output hoặc cài đặt runtime phù hợp.
 - Khi thay đổi mô hình dữ liệu, xem lại các phương thức trong `DatabaseHelper` để đảm bảo đồng bộ tạo bảng/migration tối thiểu.
 
-### Tài liệu liên quan
-- Sơ đồ lớp: xem `Class_Diagram.md`.
 
-### Giấy phép
-Đính kèm giấy phép của bạn tại đây (MIT/GPL/Commercial…).
+
+
 
 
