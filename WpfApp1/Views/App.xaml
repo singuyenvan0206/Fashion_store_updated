@@ -5,6 +5,6 @@
              StartupUri="MainWindow.xaml"
              ShutdownMode="OnMainWindowClose">
     <Application.Resources>
-         
+        <local:BooleanToStatusColorConverter x:Key="BooleanToStatusColorConverter" />
     </Application.Resources>
 </Application>

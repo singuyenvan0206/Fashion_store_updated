@@ -39,8 +39,6 @@
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                     <Button Content="🔄 Làm mới" Width="100" Height="32" Background="#FF9800" Foreground="White" 
                             FontWeight="SemiBold" Margin="0,0,8,0" Click="RefreshButton_Click"/>
-                    <Button Content="📥 Xuất Excel" Width="100" Height="32" Background="#4CAF50" Foreground="White" 
-                            FontWeight="SemiBold" Margin="0,0,8,0" Click="ExportButton_Click"/>
                     <Button x:Name="OpenSettingsButton" Content="⚙️ Cài đặt" Width="100" Height="32" Background="#9C27B0" Foreground="White" 
                             FontWeight="SemiBold" Click="OpenSettingsButton_Click" />
                 </StackPanel>
@@ -132,7 +130,7 @@
                             </StackPanel>
                         </Grid>
                     </Border>
-                    <ScrollViewer Grid.Row="1" 
+                    <ScrollViewer Grid.Row="1" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel" 
                                   HorizontalScrollBarVisibility="Auto" 
                                   VerticalScrollBarVisibility="Auto">
                         <DataGrid x:Name="InvoicesDataGrid"

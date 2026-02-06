@@ -1217,7 +1217,8 @@ namespace WpfApp1
             decimal paid,
             List<(int ProductId, int Quantity, decimal UnitPrice)> items,
             DateTime? createdDate = null,
-            int? invoiceId = null)  // Thêm tham số để chỉ định ID khi import CSV
+            int? invoiceId = null,
+            int? voucherId = null)
         {
             using var connection = new MySqlConnection(ConnectionString);
             connection.Open();
@@ -1248,11 +1249,35 @@ namespace WpfApp1
                 }
                 else
                 {
-                    // Tạo hóa đơn mới bình thường (AUTO_INCREMENT)
-                    string insertInvoice = @"INSERT INTO Invoices (CustomerId, EmployeeId, Subtotal, TaxPercent, TaxAmount, Discount, Total, Paid, CreatedDate)
-                                             VALUES (@CustomerId, @EmployeeId, @Subtotal, @TaxPercent, @TaxAmount, @Discount, @Total, @Paid, @CreatedDate);
-                                             SELECT LAST_INSERT_ID();";
+                    // Logic tìm ID trống (lấp chỗ trống) thay vì dùng AUTO_INCREMENT
+                    // Query: Tìm ID nhỏ nhất sao cho (ID + 1) chưa tồn tại.
+                    // Sử dụng UNION SELECT 0 để đảm bảo kiểm tra từ 1.
+                    string findGapSql = @"
+                        SELECT MIN(t1.Id + 1) 
+                        FROM (SELECT Id FROM Invoices UNION SELECT 0 AS Id) t1
+                        WHERE NOT EXISTS (SELECT 1 FROM Invoices t2 WHERE t2.Id = t1.Id + 1);";
+                        
+                    int nextId = 1;
+                    using (var gapCmd = new MySqlCommand(findGapSql, connection, tx))
+                    {
+                        var result = gapCmd.ExecuteScalar();
+                        if (result != DBNull.Value && result != null)
+                        {
+                            nextId = Convert.ToInt32(result);
+                        }
+                    }
+                    
+                    // Nếu table rỗng hoặc ID tìm được < 1000, và user muốn bắt đầu từ 1000? 
+                    // User ví dụ 1001. Mặc định hệ thống thường bắt đầu từ 1.
+                    // Nếu user muốn "xóa 1001 tạo lại 1001", nghĩa là lấp gap.
+                    // Code trên đã lấp gap.
+                    
+                    // Insert với ID cụ thể
+                    string insertInvoice = @"INSERT INTO Invoices (Id, CustomerId, EmployeeId, Subtotal, TaxPercent, TaxAmount, Discount, Total, Paid, CreatedDate)
+                                             VALUES (@Id, @CustomerId, @EmployeeId, @Subtotal, @TaxPercent, @TaxAmount, @Discount, @Total, @Paid, @CreatedDate);";
+                                             
                     using var invCmd = new MySqlCommand(insertInvoice, connection, tx);
+                    invCmd.Parameters.AddWithValue("@Id", nextId);
                     invCmd.Parameters.AddWithValue("@CustomerId", customerId);
                     invCmd.Parameters.AddWithValue("@EmployeeId", employeeId);
                     invCmd.Parameters.AddWithValue("@Subtotal", subtotal);
@@ -1262,8 +1287,8 @@ namespace WpfApp1
                     invCmd.Parameters.AddWithValue("@Total", total);
                     invCmd.Parameters.AddWithValue("@Paid", paid);
                     invCmd.Parameters.AddWithValue("@CreatedDate", invoiceDate);
-                    var invoiceIdObj = invCmd.ExecuteScalar();
-                    actualInvoiceId = Convert.ToInt32(invoiceIdObj);
+                    invCmd.ExecuteNonQuery();
+                    actualInvoiceId = nextId;
                 }
 
                 foreach (var (productId, quantity, unitPrice) in items)
@@ -1285,6 +1310,14 @@ namespace WpfApp1
                     stockCmd.Parameters.AddWithValue("@qty", quantity);
                     stockCmd.Parameters.AddWithValue("@pid", productId);
                     stockCmd.ExecuteNonQuery();
+                }
+
+                if (voucherId.HasValue)
+                {
+                    string updateVoucher = "UPDATE Vouchers SET UsedCount = UsedCount + 1 WHERE Id = @vid";
+                    using var vCmd = new MySqlCommand(updateVoucher, connection, tx);
+                    vCmd.Parameters.AddWithValue("@vid", voucherId.Value);
+                    vCmd.ExecuteNonQuery();
                 }
 
                 tx.Commit();
@@ -2627,7 +2660,7 @@ namespace WpfApp1
             var vouchers = new List<Voucher>();
             using var connection = new MySqlConnection(ConnectionString);
             connection.Open();
-            string sql = "SELECT * FROM Vouchers ORDER BY CreatedDate DESC";
+            string sql = "SELECT * FROM Vouchers ORDER BY Id DESC";
             using var cmd = new MySqlCommand(sql, connection);
             using var reader = cmd.ExecuteReader();
             while (reader.Read())

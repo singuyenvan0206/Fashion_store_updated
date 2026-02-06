@@ -5,19 +5,41 @@ namespace WpfApp1
 {
     public partial class SupplierManagementWindow : Window
     {
-        private List<Supplier> _suppliers = new();
+        private PaginationHelper<Supplier> _paginationHelper = new();
 
         public SupplierManagementWindow()
         {
             InitializeComponent();
+            _paginationHelper.PageChanged += RefreshSupplierList;
+            _paginationHelper.SetPageSize(12); // Increased to 12 for compact view
             LoadSuppliers();
         }
 
         private void LoadSuppliers()
         {
-            _suppliers = DatabaseHelper.GetAllSuppliers();
-            SuppliersListBox.ItemsSource = null;
-            SuppliersListBox.ItemsSource = _suppliers;
+            var suppliers = DatabaseHelper.GetAllSuppliers();
+            _paginationHelper.SetData(suppliers);
+        }
+
+        private void RefreshSupplierList()
+        {
+            SuppliersListBox.ItemsSource = _paginationHelper.GetCurrentPageItems();
+            
+            // Update UI controls
+            if (SupplierPageInfoTextBlock != null)
+                SupplierPageInfoTextBlock.Text = _paginationHelper.GetPageInfo();
+                
+            if (TotalSuppliersTextBlock != null)
+                TotalSuppliersTextBlock.Text = $"{_paginationHelper.TotalItems} nhà cung cấp";
+                
+            if (SupplierCurrentPageTextBox != null)
+                SupplierCurrentPageTextBox.Text = _paginationHelper.CurrentPage.ToString();
+                
+            // Update button states
+            if (SupplierFirstPageButton != null) SupplierFirstPageButton.IsEnabled = _paginationHelper.CanGoFirst;
+            if (SupplierPrevPageButton != null) SupplierPrevPageButton.IsEnabled = _paginationHelper.CanGoPrevious;
+            if (SupplierNextPageButton != null) SupplierNextPageButton.IsEnabled = _paginationHelper.CanGoNext;
+            if (SupplierLastPageButton != null) SupplierLastPageButton.IsEnabled = _paginationHelper.CanGoLast;
         }
 
         private void AddButton_Click(object sender, RoutedEventArgs e)
@@ -136,6 +158,45 @@ namespace WpfApp1
                 EmailTextBox.Text = selectedSupplier.Email;
                 AddressTextBox.Text = selectedSupplier.Address;
                 NoteTextBox.Text = selectedSupplier.Note;
+            }
+        }
+        // Pagination Event Handlers
+        private void SupplierFirstPageButton_Click(object sender, RoutedEventArgs e)
+        {
+            _paginationHelper.FirstPage();
+        }
+
+        private void SupplierPrevPageButton_Click(object sender, RoutedEventArgs e)
+        {
+            _paginationHelper.PreviousPage();
+        }
+
+        private void SupplierNextPageButton_Click(object sender, RoutedEventArgs e)
+        {
+            _paginationHelper.NextPage();
+        }
+
+        private void SupplierLastPageButton_Click(object sender, RoutedEventArgs e)
+        {
+            _paginationHelper.LastPage();
+        }
+
+        private void SupplierCurrentPageTextBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == System.Windows.Input.Key.Enter)
+            {
+                if (int.TryParse(SupplierCurrentPageTextBox.Text, out int pageNumber))
+                {
+                    if (!_paginationHelper.GoToPage(pageNumber))
+                    {
+                        SupplierCurrentPageTextBox.Text = _paginationHelper.CurrentPage.ToString();
+                        MessageBox.Show($"Trang không hợp lệ. Vui lòng nhập từ 1 đến {_paginationHelper.TotalPages}", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
+                }
+                else
+                {
+                    SupplierCurrentPageTextBox.Text = _paginationHelper.CurrentPage.ToString();
+                }
             }
         }
     }

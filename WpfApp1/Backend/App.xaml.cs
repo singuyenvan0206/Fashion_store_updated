@@ -8,6 +8,20 @@ namespace WpfApp1
     {
         protected override void OnStartup(StartupEventArgs e)
         {
+            var cultureInfo = new System.Globalization.CultureInfo("vi-VN");
+            cultureInfo.NumberFormat.CurrencySymbol = "đ"; // Customize currency symbol if needed
+            
+            System.Threading.Thread.CurrentThread.CurrentCulture = cultureInfo;
+            System.Threading.Thread.CurrentThread.CurrentUICulture = cultureInfo;
+            System.Globalization.CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+            System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+            
+            // Fix for WPF FrameworkElement.Language property which defaults to en-US
+            FrameworkElement.LanguageProperty.OverrideMetadata(
+                typeof(FrameworkElement),
+                new FrameworkPropertyMetadata(
+                    System.Windows.Markup.XmlLanguage.GetLanguage(cultureInfo.IetfLanguageTag)));
+
             base.OnStartup(e);
             TryInitializeDatabaseWithFallback();
         }

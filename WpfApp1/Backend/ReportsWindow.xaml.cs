@@ -141,17 +141,6 @@ namespace WpfApp1
             LoadInvoices();
         }
 
-        private void ExportButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (_invoices == null || _invoices.Count == 0)
-            {
-                MessageBox.Show("Không có dữ liệu để xuất.", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
-            }
-
-            ExportHelper.ExportToCsv(_invoices, $"BaoCaoHoaDon_{DateTime.Now:yyyyMMdd_HHmm}.csv");
-        }
-
         private void TodayButton_Click(object sender, RoutedEventArgs e)
         {
             FromDatePicker.SelectedDate = DateTime.Today;
@@ -370,6 +359,15 @@ namespace WpfApp1
             {
                 var printWindow = new InvoicePrintWindow(row.Id, 1);
                 printWindow.ShowDialog();
+            }
+        }
+        private void ScrollViewer_PreviewMouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
+        {
+            var scrollViewer = sender as ScrollViewer;
+            if (scrollViewer != null)
+            {
+                scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset - e.Delta);
+                e.Handled = true;
             }
         }
     }

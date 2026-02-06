@@ -366,7 +366,16 @@ namespace WpfApp1
             var invoiceWindow = new InvoiceManagementWindow();
             ShowOwnedDialog(invoiceWindow);
         }
-
+        private void VoucherManagement_Click(object sender, RoutedEventArgs e)
+        {
+            var voucherWindow = new VoucherManagementWindow();
+            ShowOwnedDialog(voucherWindow);
+        }
+        private void SupplierManagement_Click(object sender, RoutedEventArgs e)
+        {
+            var supplierWindow = new SupplierManagementWindow();
+            ShowOwnedDialog(supplierWindow);
+        }
         private void ReportsManagement_Click(object sender, RoutedEventArgs e)
         {
             var reportsWindow = new ReportsWindow();
@@ -409,6 +418,16 @@ namespace WpfApp1
             }
         }
 
+        private void ScrollViewer_PreviewMouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
+        {
+            var scrollViewer = sender as ScrollViewer;
+            if (scrollViewer != null)
+            {
+                scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset - e.Delta);
+                e.Handled = true;
+            }
+        }
+
         private void NavList_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
             if (MainContentHost == null || DefaultContentScrollViewer == null)
@@ -438,6 +457,8 @@ namespace WpfApp1
                 {
                     "📦 Sản Phẩm" or "Products" => new ProductManagementWindow(),
                     "📂 Danh Mục" or "Categories" => new CategoryManagementWindow(),
+                    "🏭 Nhà Cung Cấp" or "Suppliers" => new SupplierManagementWindow(),
+                    "🎟️ Mã Giảm Giá" or "Vouchers" => new VoucherManagementWindow(),
                     // Product Search UI removed
                     "👥 Khách Hàng" or "Customers" => new CustomerManagementWindow(),
                     "🧾 Hóa Đơn" or "Invoices" => new InvoiceManagementWindow(),

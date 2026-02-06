@@ -8,11 +8,13 @@ namespace WpfApp1
 {
     public partial class VoucherManagementWindow : Window
     {
-        private List<Voucher> _vouchers = new();
+        private PaginationHelper<Voucher> _paginationHelper = new();
 
         public VoucherManagementWindow()
         {
             InitializeComponent();
+            _paginationHelper.PageChanged += RefreshVoucherList;
+            _paginationHelper.SetPageSize(6);
             LoadVouchers();
             StartDatePicker.SelectedDate = DateTime.Today;
             EndDatePicker.SelectedDate = DateTime.Today.AddDays(30);
@@ -20,9 +22,29 @@ namespace WpfApp1
 
         private void LoadVouchers()
         {
-            _vouchers = DatabaseHelper.GetAllVouchers();
-            VouchersListBox.ItemsSource = null;
-            VouchersListBox.ItemsSource = _vouchers;
+            var vouchers = DatabaseHelper.GetAllVouchers();
+            _paginationHelper.SetData(vouchers);
+        }
+
+        private void RefreshVoucherList()
+        {
+            VouchersListBox.ItemsSource = _paginationHelper.GetCurrentPageItems();
+            
+            // Update UI controls
+            if (VoucherPageInfoTextBlock != null)
+                VoucherPageInfoTextBlock.Text = _paginationHelper.GetPageInfo();
+                
+            if (TotalVouchersTextBlock != null)
+                TotalVouchersTextBlock.Text = $"{_paginationHelper.TotalItems} mã";
+                
+            if (VoucherCurrentPageTextBox != null)
+                VoucherCurrentPageTextBox.Text = _paginationHelper.CurrentPage.ToString();
+                
+            // Update button states
+            if (VoucherFirstPageButton != null) VoucherFirstPageButton.IsEnabled = _paginationHelper.CanGoFirst;
+            if (VoucherPrevPageButton != null) VoucherPrevPageButton.IsEnabled = _paginationHelper.CanGoPrevious;
+            if (VoucherNextPageButton != null) VoucherNextPageButton.IsEnabled = _paginationHelper.CanGoNext;
+            if (VoucherLastPageButton != null) VoucherLastPageButton.IsEnabled = _paginationHelper.CanGoLast;
         }
 
         private void AddButton_Click(object sender, RoutedEventArgs e)
@@ -177,6 +199,55 @@ namespace WpfApp1
                 EndDatePicker.SelectedDate = selected.EndDate;
                 UsageLimitTextBox.Text = selected.UsageLimit.ToString();
                 IsActiveCheckBox.IsChecked = selected.IsActive;
+            }
+        }
+        private void ScrollViewer_PreviewMouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
+        {
+            var scrollViewer = sender as ScrollViewer;
+            if (scrollViewer != null)
+            {
+                scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset - e.Delta);
+                e.Handled = true;
+            }
+        }
+
+        // Pagination Event Handlers
+        private void VoucherFirstPageButton_Click(object sender, RoutedEventArgs e)
+        {
+            _paginationHelper.FirstPage();
+        }
+
+        private void VoucherPrevPageButton_Click(object sender, RoutedEventArgs e)
+        {
+            _paginationHelper.PreviousPage();
+        }
+
+        private void VoucherNextPageButton_Click(object sender, RoutedEventArgs e)
+        {
+            _paginationHelper.NextPage();
+        }
+
+        private void VoucherLastPageButton_Click(object sender, RoutedEventArgs e)
+        {
+            _paginationHelper.LastPage();
+        }
+
+        private void VoucherCurrentPageTextBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == System.Windows.Input.Key.Enter)
+            {
+                if (int.TryParse(VoucherCurrentPageTextBox.Text, out int pageNumber))
+                {
+                    if (!_paginationHelper.GoToPage(pageNumber))
+                    {
+                        VoucherCurrentPageTextBox.Text = _paginationHelper.CurrentPage.ToString();
+                        MessageBox.Show($"Trang không hợp lệ. Vui lòng nhập từ 1 đến {_paginationHelper.TotalPages}", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
+                }
+                else
+                {
+                    VoucherCurrentPageTextBox.Text = _paginationHelper.CurrentPage.ToString();
+                }
             }
         }
     }

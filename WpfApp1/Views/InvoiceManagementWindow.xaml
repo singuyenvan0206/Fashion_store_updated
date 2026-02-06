@@ -173,36 +173,36 @@
 							</Style>
 						</DataGridTextColumn.ElementStyle>
 					</DataGridTextColumn>
-					<DataGridTextColumn Header="SL" Binding="{Binding Quantity}" Width="100" IsReadOnly="True">
+					<DataGridTextColumn Header="SL" Binding="{Binding Quantity}" Width="80" IsReadOnly="True">
 						<DataGridTextColumn.ElementStyle>
 							<Style TargetType="TextBlock">
 								<Setter Property="TextAlignment" Value="Right"/>
 							</Style>
 						</DataGridTextColumn.ElementStyle>
 					</DataGridTextColumn>
-					<DataGridTextColumn Header="Thành tiền" Binding="{Binding LineTotal, StringFormat=N0}" Width="150" IsReadOnly="True">
+					<DataGridTextColumn Header="Thành tiền" Binding="{Binding LineTotal, StringFormat=N0}" Width="140" IsReadOnly="True">
 						<DataGridTextColumn.ElementStyle>
 							<Style TargetType="TextBlock">
 								<Setter Property="TextAlignment" Value="Right"/>
 							</Style>
 						</DataGridTextColumn.ElementStyle>
 					</DataGridTextColumn>
-					<DataGridTextColumn Header="Thuế (%)" Binding="{Binding CategoryTaxPercent, StringFormat=N2}" Width="100" IsReadOnly="True">
+					<DataGridTextColumn Header="Thuế (%)" Binding="{Binding CategoryTaxPercent, StringFormat=N2}" Width="80" IsReadOnly="True">
 						<DataGridTextColumn.ElementStyle>
 							<Style TargetType="TextBlock">
 								<Setter Property="TextAlignment" Value="Right"/>
 							</Style>
 						</DataGridTextColumn.ElementStyle>
 					</DataGridTextColumn>
-					<DataGridTemplateColumn Header="⚙️ Thao tác" Width="240">
+					<DataGridTemplateColumn Header="⚙️ Thao tác" Width="180">
 						<DataGridTemplateColumn.CellTemplate>
 							<DataTemplate>
 								<StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-									<Button Content="➕" Width="32" Height="28" Margin="0,0,4,0" 
+									<Button Content="➕" Width="30" Height="28" Margin="0,0,4,0" 
 											Background="#4CAF50" Foreground="White" FontWeight="Bold" Click="IncreaseQtyButton_Click"/>
-									<Button Content="➖" Width="32" Height="28" Margin="0,0,4,0" 
+									<Button Content="➖" Width="30" Height="28" Margin="0,0,4,0" 
 											Background="#FF9800" Foreground="White" FontWeight="Bold" Click="DecreaseQtyButton_Click"/>
-									<Button Content="🗑️" Width="50" Height="28" 
+									<Button Content="🗑️" Width="40" Height="28" 
 											Background="#F44336" Foreground="White" FontWeight="Bold" Click="RemoveItemButton_Click"/>
 								</StackPanel>
 							</DataTemplate>
@@ -227,7 +227,7 @@
 					</Border>
 					
 					<!-- Totals Content -->
-					<ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+					<ScrollViewer x:Name="TotalsScrollViewer" Grid.Row="1" VerticalScrollBarVisibility="Auto" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
 						<Border Background="#F8F9FA" CornerRadius="8" Padding="16">
 						<Grid>
 							<Grid.RowDefinitions>
@@ -258,7 +258,16 @@
 								<TextBlock x:Name="TaxAmountTextBlock" Text="0₫" Width="80" TextAlignment="Left" Margin="6,0,0,0" FontWeight="Bold"/>
 							</StackPanel>
 
-							<StackPanel Grid.Row="2" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,8,0,8">
+							<!-- Voucher Selection -->
+							<StackPanel Grid.Row="2" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,8,0,0">
+								<TextBlock Text="🎟️ Voucher:" VerticalAlignment="Center" FontWeight="SemiBold"/>
+								<ComboBox x:Name="VoucherComboBox" Width="180" Height="28" Margin="6,0,0,0" 
+										  DisplayMemberPath="Code" SelectedValuePath="Id"
+										  SelectionChanged="VoucherComboBox_SelectionChanged"
+										  ToolTip="Chọn mã giảm giá"/>
+							</StackPanel>
+
+							<StackPanel Grid.Row="3" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,8,0,8">
 								<TextBlock Text="🎁 Giảm giá:" VerticalAlignment="Center" FontWeight="SemiBold"/>
 							<ComboBox x:Name="DiscountModeComboBox" Width="70" Height="28" Margin="6,0,0,0" SelectedIndex="0" SelectionChanged="TotalsSelectionChanged">
 									<ComboBoxItem Content="VND"/>
@@ -267,15 +276,15 @@
 								<TextBox x:Name="DiscountValueTextBox" Width="80" Height="28" Text="0" TextChanged="TotalsInput_TextChanged" Margin="6,0,0,0" TextAlignment="Center"/>
 								
 							</StackPanel>
-                            <StackPanel Grid.Row="3" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,0,0,8">
+                            <StackPanel Grid.Row="4" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,0,0,8">
                             <TextBlock x:Name="TierDiscountInlineText" Text="(+ Ưu đãi hạng: 0₫)" Margin="8,0,0,0" Foreground="#4CAF50" FontWeight="SemiBold"/>
                             </StackPanel>
-                            <Border Grid.Row="4" Grid.ColumnSpan="2" Background="#E0E0E0" Height="1" Margin="0,0,0,8"/>
+                            <Border Grid.Row="5" Grid.ColumnSpan="2" Background="#E0E0E0" Height="1" Margin="0,0,0,8"/>
 
-							<TextBlock Grid.Row="5" Grid.Column="0" Text="💵 Tổng cộng:" HorizontalAlignment="Left" FontWeight="Bold" FontSize="16" Margin="0,0,8,8" Foreground="#D32F2F"/>
-							<TextBlock x:Name="TotalTextBlock" Grid.Row="5" Grid.Column="1" Text="0₫" HorizontalAlignment="Left" TextAlignment="Left" FontWeight="Bold" FontSize="22" Foreground="#D32F2F"/>
+							<TextBlock Grid.Row="6" Grid.Column="0" Text="💵 Tổng cộng:" HorizontalAlignment="Left" FontWeight="Bold" FontSize="16" Margin="0,0,8,8" Foreground="#D32F2F"/>
+							<TextBlock x:Name="TotalTextBlock" Grid.Row="6" Grid.Column="1" Text="0₫" HorizontalAlignment="Left" TextAlignment="Left" FontWeight="Bold" FontSize="22" Foreground="#D32F2F"/>
 
-							<StackPanel Grid.Row="6" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,8,0,8">
+							<StackPanel Grid.Row="7" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,8,0,8">
 								<TextBlock Text="💳 PTTT:" VerticalAlignment="Center" FontWeight="SemiBold"/>
 								<ComboBox x:Name="PaymentMethodComboBox" Width="100" Height="28" Margin="6,0,12,0" SelectedIndex="0" FontSize="12" SelectionChanged="PaymentMethodComboBox_SelectionChanged">
 									<ComboBoxItem Content="💵 Tiền mặt"/>
@@ -286,13 +295,13 @@
 								<TextBox x:Name="PaidTextBox" Width="70" Height="28" Text="0" TextChanged="TotalsInput_TextChanged" Margin="6,0,0,0" TextAlignment="Center"/>
 							</StackPanel>
 
-							<StackPanel Grid.Row="7" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,8,0,12">
+							<StackPanel Grid.Row="8" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,8,0,12">
 								<TextBlock Text="🔄 Tiền thừa:" VerticalAlignment="Center" FontWeight="Bold"/>
 								<TextBlock x:Name="ChangeTextBlock" Text="0₫" Width="80" TextAlignment="Left" Margin="6,0,0,0" FontWeight="Bold" Foreground="#388E3C"/>
 							</StackPanel>
 
 							<!-- QR Code Section -->
-                            <Border Grid.Row="8" Grid.ColumnSpan="2" Background="#FFFFFF" CornerRadius="10" Padding="12" Margin="0,0,0,8" 
+                            <Border Grid.Row="9" Grid.ColumnSpan="2" Background="#FFFFFF" CornerRadius="10" Padding="12" Margin="0,0,0,8" 
 									BorderBrush="#4CAF50" BorderThickness="2" Width="260">
 								<Grid>
 									<Grid.RowDefinitions>
@@ -323,7 +332,7 @@
 								</Grid>
 							</Border>
 							
-							<StackPanel Grid.Row="9" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,0">
+							<StackPanel Grid.Row="10" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,0">
 								<Button x:Name="SaveInvoiceButton" Content="💾 Lưu Hóa Đơn" Width="140" Height="40" 
 										Background="#4CAF50" Foreground="White" FontWeight="SemiBold" Click="SaveInvoiceButton_Click" Margin="0,0,8,0"/>
 								<Button x:Name="ClearInvoiceButton" Content="🧹 Xóa Hóa Đơn" Width="140" Height="40"

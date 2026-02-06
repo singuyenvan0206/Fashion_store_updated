@@ -22,10 +22,27 @@ namespace WpfApp1
         {
             LoadCustomers();
             LoadProducts();
+            LoadVouchers();
             ClearInvoice();
             UpdateTotals();
             InitializeQRCode();
             FocusProductEntry();
+        }
+
+        private void LoadVouchers()
+        {
+            try
+            {
+                var vouchers = DatabaseHelper.GetAllVouchers().Where(v => v.IsActive).ToList();
+                if (VoucherComboBox != null)
+                {
+                    VoucherComboBox.ItemsSource = vouchers;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Lỗi tải danh sách voucher: {ex.Message}");
+            }
         }
 
         private void InitializeQRCode()
@@ -414,17 +431,24 @@ namespace WpfApp1
 
         #region Totals Calculation
 
+        private bool _isInternalUpdate = false;
+
         private void UpdateTotals()
         {
-            if (!AreTotalsControlsReady()) return;
+            if (!AreTotalsControlsReady() || _isInternalUpdate) return;
 
             try
             {
                 var subtotal = _invoiceItems.Sum(item => item.LineTotal);
                 UpdateSubtotalDisplay(subtotal);
 
+                // Auto-apply best voucher based on new subtotal
+                ApplyBestVoucher(subtotal);
+
                 // Thuế theo danh mục: tính tổng thuế từ từng dòng
                 var taxAmount = _invoiceItems.Sum(item => item.LineTotal * (item.CategoryTaxPercent / 100m));
+                
+                // Recalculate discount based on (potentially updated) UI
                 var discount = CalculateDiscount(subtotal);
                 var tierDiscount = CalculateTierDiscount(subtotal);
 
@@ -438,6 +462,79 @@ namespace WpfApp1
             {
                 // Silent failure
             }
+        }
+
+        private void ApplyBestVoucher(decimal subtotal)
+        {
+            try
+            {
+                if (VoucherComboBox == null) return;
+                
+                var vouchers = VoucherComboBox.ItemsSource as List<Voucher>;
+                if (vouchers == null || vouchers.Count == 0) return;
+
+                var now = DateTime.Now;
+
+                var bestVoucher = vouchers
+                    .Where(v => 
+                                subtotal >= v.MinInvoiceAmount &&
+                                (v.StartDate == null || now >= v.StartDate) &&
+                                (v.EndDate == null || now <= v.EndDate) &&
+                                (v.UsageLimit == 0 || v.UsedCount < v.UsageLimit))
+                    .OrderByDescending(v => CalculateVoucherValue(subtotal, v))
+                    .FirstOrDefault();
+
+                if (VoucherComboBox.SelectedItem != bestVoucher)
+                {
+                     VoucherComboBox.SelectedItem = bestVoucher;
+                }
+            }
+            catch { }
+        }
+
+        private void VoucherComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (_isInternalUpdate) return;
+            
+            _isInternalUpdate = true;
+            try
+            {
+                if (VoucherComboBox.SelectedItem is Voucher voucher)
+                {
+                    foreach (ComboBoxItem item in DiscountModeComboBox.Items)
+                    {
+                        var content = item.Content?.ToString()?.Trim();
+                        var type = voucher.DiscountType?.Trim();
+                        
+                        if (string.Equals(content, type, StringComparison.OrdinalIgnoreCase))
+                        {
+                            DiscountModeComboBox.SelectedItem = item;
+                            break;
+                        }
+                    }
+                    DiscountValueTextBox.Text = voucher.DiscountValue.ToString("G29");
+                }
+                else
+                {
+                     // User cleared voucher or auto-cleared -> Reset discount?
+                     // Let's reset to 0 to avoid confusion if "Auto Apply" removes an invalid voucher
+                     DiscountValueTextBox.Text = "0";
+                }
+            }
+            finally
+            {
+                _isInternalUpdate = false;
+                UpdateTotals(); 
+            }
+        }
+
+        private decimal CalculateVoucherValue(decimal subtotal, Voucher voucher)
+        {
+            if (voucher.DiscountType == "%")
+            {
+                return subtotal * (voucher.DiscountValue / 100m);
+            }
+            return voucher.DiscountValue;
         }
 
         private void UpdateSubtotalDisplay(decimal subtotal)
@@ -761,11 +858,18 @@ namespace WpfApp1
 
                 var currentUser = Application.Current.Resources["CurrentUser"]?.ToString() ?? "admin";
                 var employeeId = DatabaseHelper.GetEmployeeIdByUsername(currentUser);
+                
+                // Get selected voucher ID
+                int? voucherId = null;
+                if (VoucherComboBox != null && VoucherComboBox.SelectedValue is int vid)
+                {
+                    voucherId = vid;
+                }
 
-                System.Diagnostics.Debug.WriteLine($"Attempting to save invoice: CustomerId={customerId}, EmployeeId={employeeId}, Items={itemsForSave.Count}");
+                System.Diagnostics.Debug.WriteLine($"Attempting to save invoice: CustomerId={customerId}, EmployeeId={employeeId}, Items={itemsForSave.Count}, VoucherId={voucherId}");
 
                 var result = DatabaseHelper.SaveInvoice(customerId, employeeId, subtotal, taxPercent,
-                    taxAmount, discount, total, paid, itemsForSave);
+                    taxAmount, discount, total, paid, itemsForSave, voucherId: voucherId);
 
                 if (!result)
                 {
@@ -882,10 +986,22 @@ namespace WpfApp1
             catch { return 1; }
         }
 
+        private void ScrollViewer_PreviewMouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
+        {
+            var scrollViewer = sender as ScrollViewer;
+            if (scrollViewer != null)
+            {
+                scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset - e.Delta);
+                e.Handled = true;
+            }
+        }
+
         #endregion
     }
 
     #region View Models
+
+
 
     public class InvoiceItemViewModel
     {

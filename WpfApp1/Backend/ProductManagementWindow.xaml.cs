@@ -514,6 +514,15 @@ namespace WpfApp1
                 }
             }
         }
+        private void ScrollViewer_PreviewMouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
+        {
+            var scrollViewer = sender as ScrollViewer;
+            if (scrollViewer != null)
+            {
+                scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset - e.Delta);
+                e.Handled = true;
+            }
+        }
     }
 
     public class ProductViewModel
@@ -541,5 +550,6 @@ namespace WpfApp1
         public int Id { get; set; }
         public string Name { get; set; } = "";
         public decimal TaxPercent { get; set; }
+
     }
 }

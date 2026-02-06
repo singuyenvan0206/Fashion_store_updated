@@ -28,7 +28,7 @@
                 </StackPanel>
             </Grid>
         </Border>
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
             <Border Background="White" Padding="50" Margin="20">
                 <Grid x:Name="InvoicePreviewRoot" Width="800">
                     <Grid.RowDefinitions>

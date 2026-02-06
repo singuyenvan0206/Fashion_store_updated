@@ -130,14 +130,13 @@
                     </Border>
                     
                     <!-- Navigation Menu -->
-                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
                         <StackPanel Margin="0,20,0,0">
                             <ListBox x:Name="NavList" 
                                      SelectionChanged="NavList_SelectionChanged" 
                                      Background="Transparent" 
                                      BorderThickness="0" 
-                                     Foreground="#F8FAFC"
-                                     Style="{StaticResource {x:Type ListBox}}">
+                                     Foreground="#F8FAFC">
                                 <ListBox.Resources>
                                     <Style TargetType="ListBoxItem">
                                         <Setter Property="Template">
@@ -203,7 +202,7 @@
 
             <!-- Right Content -->
             <Grid Grid.Column="1">
-                <ScrollViewer x:Name="DefaultContentScrollViewer" VerticalScrollBarVisibility="Auto">
+                <ScrollViewer x:Name="DefaultContentScrollViewer" VerticalScrollBarVisibility="Auto" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
                     <Grid Margin="30">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
@@ -288,7 +287,7 @@
                         </Grid>
                     </Grid>
                 </ScrollViewer>
-                <ScrollViewer Grid.Column="1" x:Name="MainContentScrollViewer" VerticalScrollBarVisibility="Auto" Visibility="Collapsed">
+                <ScrollViewer Grid.Column="1" x:Name="MainContentScrollViewer" VerticalScrollBarVisibility="Auto" Visibility="Collapsed" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
                     <ContentControl x:Name="MainContentHost"/>
                 </ScrollViewer>
             </Grid>
